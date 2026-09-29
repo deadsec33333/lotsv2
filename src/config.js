@@ -1,28 +1,85 @@
+// Everything you are likely to change lives in this file:
+// project name, ticker, links, colors, economy numbers and wording.
+
 export const CONFIG = {
- name: 'PROJECT_NAME', ticker: '$TICKER', pumpUrl: 'https://pump.fun/coin/PROJECT_TOKEN_ADDRESS',
- colors: { tone0:'#6e9e43', tone1:'#869776', tone2:'#20312b08', tone3:'#20312b03', tone4:'#8c958b', tone5:'#f3f5ee', tone6:'#96a777', tone7:'#9cba6a', tone8:'#afb9ad', tone9:'#ffffff24', tone10:'#849962', tone11:'#8ba76a', tone12:'#667b58', tone13:'#20312b22', tone14:'#c3ccbe', tone15:'#20312b38', tone16:'#20312b20', tone17:'#62813d', tone18:'#eff2e8', tone19:'#819c5b', tone20:'#a03428', tone21:'#20312b40', tone22:'#ffffff22', ink:'#20312b', muted:'#78817a', accent:'#d4f77d', paper:'#fafbf7', line:'#e1e6dc', white:'#ffffff', lilac:'#eee8fc', peach:'#fae9d9', blue:'#e6eff8', heatLow:'#edf4db', heatMid:'#ffe3ab', heatHigh:'#ffb5a5' },
- prices: { small:2500, medium:6000, large:12000, hero:25000 }, durations: { 1:1, 3:0.9, 7:0.75 }, takeoverMinimum:1.2,
- fakeUsdPerToken:0.00012, fakeSolUsd:150, sessionOwner:'You · DEMO...0001', simulationMs:[10000,20000], maxImageBytes:2000000,
- tiers:['small','medium','large','hero'], limits:{text:180,image:100,logo:36,link:48,block:300},
- copy:{
- labels:{home:'Home', websiteStatus:'A WEBSITE WITH OPEN POSITIONS.', availableCount:'little possibilities', sticker:'THIS SPACE\nCOULD BE YOURS ↗', neighbors:'01 / THE NEIGHBORS', resident:'RESIDENT', from:'from', growth:'02 / ROOM TO GROW', space:'SPACE', pick:'03 / PICK YOUR PLACE', fineprint:'04 / THE FINE PRINT', activity:'LIVE ACTIVITY / SIMULATED', build:'BUILD MODE', spaces:'spaces. Pick yours.', done:'Done ×', changes:'changes', slot:'SLOT', minimum:'Minimum', rent:'rent', takeover:'takeover', visit:'Visit current link ↗', open:'Open', next:'Your next big thing', invalidDuration:'Invalid duration', unknownSlot:'Unknown slot', changed:'This slot changed. Please reopen it.', demoWallet:'● DEMO...0001', artworkFooter:'A LITTLE CORNER OF THE INTERNET'},
- nav:['Features','Community','Pricing'], buy:'Buy', build:'Build', help:'?', connect:'Connect wallet', connected:'Demo wallet connected', views:'12,400 page views / 7d',
- eyebrow:'A LITTLE SPACE. UNLIMITED POSSIBILITIES.', headline:'Your next big thing\nstarts right here.', subheadline:'The internet’s most available real estate. Rent a little corner, make it yours, and see what happens next.', cta:'Find your spot', secondary:'How it works',
- availability:'OPEN FOR ABSOLUTELY EVERYONE', heroLabel:'One website. Everyone’s canvas.', heroNote:'A perfectly normal landing page. Until you move in.', promoted:'CURRENTLY TAKING UP SPACE', trade:'Trade',
- community:'Good company. Questionable ideas.', communitySub:'Every card is five slots. Rent one.', cardNote:'Plus a separately rentable avatar. Six slots, zero promises.', cardFeatures:['An idea worth a little attention','Your very convincing feature','A third reason. Just in case.'], cardButton:'Meet your next obsession',
- logos:'IN EXCELLENT (AND TEMPORARY) COMPANY', logoPlaceholder:'You can buy this logo',
- featureTitle:'Built for whatever\nyou’re building.', featureSub:'A launch. A joke. A very expensive inside joke. There’s a spot for that.',
- features:[['A big space for a small idea.','Take up a little more of the internet. This corner could be your entire personality.','Make a little noise'],['Your product. Our rectangle.','The easiest way to look like you belong here.','Claim this corner'],['Great things fit in here.','No pitch deck required. Just something to say.','Put it here'],['Room for a hot take.','Ideally a reasonably good one.','Say something'],['This could be a cat.','The internet would understand.','Add your cat'],['Launch something tiny.','Every big idea starts somewhere.','Start small'],['A link to your world.','One click. Endless possibilities.','Take us there']],
- pricingTitle:'Small commitment. Big main-character energy.', pricingSub:'Choose your space. Choose your time. Pay in pretend tokens.', tierNames:['A little mention','A good-sized idea','Hard to miss','Center of attention'], tierDescriptions:['Labels, links & little moments','Cards, names & supporting acts','Bigger canvases for bigger plans','The best seat on the page'], pricingButton:'Explore available slots',
- faqTitle:'A few perfectly reasonable questions.', faq:[['Is literally everything for sale?','Every outlined element is an independent slot. The editing controls stay ours so the page always works.'],['How do I claim a slot?','Click any slot, add your content, choose one, three, or seven days, and confirm. This demo uses pretend tokens only.'],['Can someone take over my spot?','Yes. Every occupied slot has a takeover price set by its owner. A takeover replaces the content immediately.'],['What happens when time runs out?','The original template content comes back and the slot becomes available again.'],['Where do my tokens go?','Nowhere in this demo. There is no wallet connection, blockchain, payment, or backend.'],['Will my masterpiece last forever?','Probably not. Your demo changes last for this tab’s session, and other imaginary renters are always moving in.']],
- footer:'A very normal website. A very unusual lease.', footerLinks:['History','Timeline','Docs','My slots','X'], legal:'All rentals, wallets, prices and activity are simulated.', activity:'The neighborhood is moving.', activitySub:'A live look at who’s making themselves at home.', empty:'Nothing here yet. Your first spot is waiting.',
- },
- demo:{ names:['MOSS CLUB','sleepy.studio','BREAD LAB','tiny planet','NOODLE DAO','soft launch'], slogans:['Touch grass. Digitally.','Less hustle. More horizontal.','We are so back (in the oven).','Small planet. Huge plans.','Powered by absolutely no roadmap.','Still early. Still figuring it out.'], pills:['$MOSS ↗','$NAP ↗','$LOAF ↗','$SMOL ↗'], wallets:['7xKq...9fPa','4mLs...2bRz','8pTe...1qNc','3vWb...6dHu'], palettes:['#d4f77d','#eee8fc','#fae9d9','#e6eff8'] },
- ui:{ rent:'Rent', takeover:'Take over', available:'Available', owner:'Current owner', duration:'Rental duration', total:'Total', cancel:'Cancel', save:'Confirm rental', content:'Your content', url:'Destination URL (optional)', image:'Upload an image', alt:'Image description', takeoverPrice:'Your takeover price', close:'Close editor', preview:'LIVE PREVIEW', editor:'Make this space yours.', demo:'Demo controls', random:'Random takeover', fill:'Fill all slots', empty:'Empty all slots', burst:'Trigger 10 events', heat:'Heat map', history:'History', timeline:'Timeline', mine:'My slots', docs:'How this works', back:'Back to the neighborhood', events:'Recent activity', noOwner:'Nobody. Yet.', expired:'Expired', days:'days', day:'day', imageHint:'PNG, JPG, GIF or WebP · up to 2 MB', saved:'Your spot is live. Make yourself at home.', fake:'Demo only. No tokens will move.', invalidUrl:'Use a complete https:// or http:// URL.', invalidImage:'Choose a PNG, JPG, GIF or WebP under 2 MB.', invalidPrice:'Takeover price must meet the minimum shown.', reset:'All slots are available again.', connectNotice:'Demo wallet connected. No real wallet was accessed.', expiry:'Time left', pricingHint:'3 days saves 10% · 7 days saves 25%', buyHint:'This is a placeholder pump.fun link. No token address is configured.', helpHint:'Hover to discover a slot. Build reveals them all. Click to edit. Press D for demo controls.', noImage:'Your image here', eventRent:'rented', eventTake:'took over', eventExpired:'expired', sessionNote:'Changes are saved in this tab’s session.', uploadError:'Could not read this image.' }
+  name: 'PROJECT_NAME',
+  ticker: '$TICKER',
+  network: 'MAINNET',
+  pumpUrl: 'https://pump.fun/coin/PROJECT_TOKEN_ADDRESS',
+  xUrl: '', // put your X profile link here, e.g. 'https://x.com/yourhandle'
+  pageViews: '11,400+',
+
+  colors: {
+    bg: '#0E0E0C',
+    band: '#1A1A17',
+    card: '#1A1A17',
+    line: '#2B2A26',
+    text: '#F4F1EA',
+    muted: '#8F897B',
+    lime: '#CCFF00',
+    lavender: '#D8B4FE',
+  },
+
+  // Colors an owner can pick for their text (editor swatches).
+  textColors: {
+    default: '#F4F1EA',
+    lime: '#CCFF00',
+    orange: '#FF8A3D',
+    pink: '#FF5FA2',
+    purple: '#B388FF',
+    red: '#FF4D4D',
+    green: '#3DDC84',
+    yellow: '#FFD23F',
+    blue: '#5EB8FF',
+    muted: '#8F897B',
+    gradient: 'linear-gradient(90deg,#FF8A3D,#FF5FA2)',
+  },
+
+  // Section background colors an owner can pick for background slots.
+  backgroundColors: {
+    default: '',
+    ink: '#141412',
+    moss: '#1B2415',
+    plum: '#221828',
+    rust: '#2A1812',
+    navy: '#121A26',
+    lime: '#2A3300',
+  },
+
+  economy: {
+    floor: 0.01, // SOL, cheapest a slot can ever be
+    takeMultiplier: 1.4, // taking an owned slot costs 1.4x its price
+    previousOwnerShare: 1.15, // previous owner is credited 1.15x the price
+    creatorShare: 0.05, // 5% of every take goes to the creator, the rest to treasury
+    cooldownMinutes: 15, // between takes on the same slot
+    decayPerWeek: 0.9, // idle slots keep 90% of their price each week
+    decayMaxWeeks: 52,
+    markupMin: 0.1,
+    markupMax: 4,
+    rentFloorPerDay: 0.0025, // rent rate must be at least 0.25% of price per day
+    rentProtocolCut: 0.35,
+    rentMaxDays: 7,
+    upgradeDays: 21,
+    upgradeBurn: { link: 50000, image: 250000, background: 250000, video: 1000000 },
+    shuffleMinutes: 90,
+    shuffleMaxPerWeek: 8,
+    fakeSolUsd: 150, // pretend SOL price for the USD switch
+  },
+
+  limits: { text: 140, long: 700, maxImageBytes: 2000000, maxVideoBytes: 2000000 },
+
+  sessionWallet: 'DeMo…0001',
+  simulationMs: [10000, 20000],
+
+  copy: {
+    modal: {
+      label: 'FIRST TIME HERE?',
+      title: 'This page is not a page.',
+      body: 'It looks like a normal landing page. It isn’t. Every nav link, headline, image, button and footer link you can see is a separate slot with its own owner, and every one of them can be bought.',
+      docs: 'READ THE DOCS',
+      ok: 'GOT IT',
+      cheapest: 'SHOW ME THE CHEAPEST SLOT',
+    },
+    demoNote: 'Demo only. No wallet is connected and no SOL or tokens move.',
+  },
 };
-export function artwork(label, index=0) {
- const color=CONFIG.demo.palettes[index%4];
- const safe=String(label).replace(/[<>&"']/g,'').slice(0,34);
- const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="560" viewBox="0 0 800 560"><rect width="800" height="560" rx="28" fill="${color}"/><g fill="none" stroke="${CONFIG.colors.ink}" stroke-width="3"><ellipse cx="400" cy="255" rx="140" ry="140"/><ellipse cx="400" cy="255" rx="65" ry="140"/><ellipse cx="400" cy="255" rx="140" ry="52"/><path d="M260 255h280M400 115v280"/></g><circle cx="513" cy="166" r="33" fill="${CONFIG.colors.ink}"/><path d="m502 166 8 8 15-18" fill="none" stroke="${color}" stroke-width="4"/><text x="400" y="464" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="600" fill="${CONFIG.colors.ink}">${safe}</text><text x="400" y="502" text-anchor="middle" font-family="monospace" font-size="12" fill="${CONFIG.colors.ink}">${CONFIG.copy.labels.artworkFooter}</text></svg>`;
- return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
-}
