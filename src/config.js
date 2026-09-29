@@ -9,21 +9,23 @@ export const CONFIG = {
   xUrl: '', // put your X profile link here, e.g. 'https://x.com/yourhandle'
   pageViews: '11,400+',
 
+  // Site colors. These are applied to the whole page as CSS variables (--bg, --text, ...).
   colors: {
-    bg: '#0E0E0C',
-    band: '#1A1A17',
-    card: '#1A1A17',
-    line: '#2B2A26',
-    text: '#F4F1EA',
-    muted: '#8F897B',
-    lime: '#CCFF00',
-    lavender: '#D8B4FE',
+    bg: '#0B0B0F',
+    band: '#131318',
+    card: '#15151B',
+    line: '#27272F',
+    text: '#F2F1F6',
+    muted: '#8A8896',
+    hl: '#FFE03A', // sticker yellow: the highlight owners put behind their text
+    cyan: '#5CE1FF', // RENTABLE badge
+    violet: '#7B5CFF', // holo accents
   },
 
   // Colors an owner can pick for their text (editor swatches).
   textColors: {
-    default: '#F4F1EA',
-    lime: '#CCFF00',
+    default: '#F2F1F6',
+    lime: '#B8FF3C',
     orange: '#FF8A3D',
     pink: '#FF5FA2',
     purple: '#B388FF',
@@ -31,7 +33,7 @@ export const CONFIG = {
     green: '#3DDC84',
     yellow: '#FFD23F',
     blue: '#5EB8FF',
-    muted: '#8F897B',
+    muted: '#8A8896',
     gradient: 'linear-gradient(90deg,#FF8A3D,#FF5FA2)',
   },
 
@@ -73,12 +75,12 @@ export const CONFIG = {
 
   copy: {
     modal: {
-      label: 'FIRST TIME HERE?',
-      title: 'This page is not a page.',
-      body: 'It looks like a normal landing page. It isn’t. Every nav link, headline, image, button and footer link you can see is a separate slot with its own owner, and every one of them can be bought.',
-      docs: 'READ THE DOCS',
-      ok: 'GOT IT',
-      cheapest: 'SHOW ME THE CHEAPEST SLOT',
+      label: 'NEW HERE?',
+      title: 'Everything here is loose.',
+      body: 'This looks like a landing page, but every word, button, picture and background on it is a separate slot with its own owner. Nothing is nailed down. All of it is for sale.',
+      docs: 'HOW IT WORKS',
+      ok: 'OKAY',
+      cheapest: 'FIND ME A CHEAP ONE',
     },
     demoNote: 'Demo only. No wallet is connected and no SOL or tokens move.',
   },

@@ -1,11 +1,14 @@
 import './styles.css';
 import { CONFIG as C } from './config.js';
 import * as D from './data.js';
+import { initMotion, rescan, kick, shake, consumeDragClick } from './motion.js';
 
 const E = C.economy;
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+Object.entries(C.colors).forEach(([k, v]) => document.documentElement.style.setProperty('--' + k, v));
 
 const ui = {
   currency: 'SOL',
@@ -69,7 +72,8 @@ function styleClass(st) {
 
 function labelHTML(s) {
   const sh = D.getShuffle();
-  const shuffled = sh && sh.pairs[s.id] ? '<b class="bdg sh">SHUFFLED</b>' : '';
+  const tier = tierOf(s);
+  const shuffled = (sh && sh.pairs[s.id] ? '<b class="bdg sh" title="Shaken: showing another slot\u2019s content">↯</b>' : '') + (tier ? `<b class="bdg ${tier}">${tier.toUpperCase()}</b>` : '');
   if (D.tenantActive(s)) return `<span class="w">${esc(s.tenant.wallet)}</span><b class="bdg t">RENTED</b>${shuffled}`;
   if (!s.owner) return `<span class="w">UNCLAIMED</span><b class="bdg u">${money(D.priceOf(s))}</b>`;
   if (s.owner === C.sessionWallet) return `<span class="w">${esc(s.owner)}</span><b class="bdg me">YOURS</b>${shuffled}`;
@@ -97,6 +101,7 @@ function contentHTML(s, c) {
   return `<span class="${styleClass(st)}"${styleAttr(st)}>${text || '&nbsp;'}</span>`;
 }
 
+function tierOf(s) { return s.takes >= 10 ? 'gold' : s.takes >= 6 ? 'holo' : ''; }
 function heatLevel(s) { return s.takes >= 6 ? 3 : s.takes >= 3 ? 2 : s.takes >= 1 ? 1 : 0; }
 function chipText(s) {
   if (ui.heat) return `#${pad(s.id)} · ${s.takes} takes`;
@@ -104,7 +109,7 @@ function chipText(s) {
 }
 
 function slotAttrs(s) {
-  return `data-id="${s.id}" data-chip="${esc(chipText(s))}" data-heat="${heatLevel(s)}" tabindex="0" role="button" aria-label="Slot ${s.id}: ${esc(s.path)}"`;
+  return `data-id="${s.id}" data-tier="${tierOf(s)}" data-chip="${esc(chipText(s))}" data-heat="${heatLevel(s)}" tabindex="0" role="button" aria-label="Slot ${s.id}: ${esc(s.path)}"`;
 }
 
 // Returns the HTML for one slot, used inside the page templates.
@@ -112,7 +117,7 @@ function S(path, cls = '') {
   const s = byPath[path];
   if (!s) return `<!-- missing ${path} -->`;
   const k = D.effectiveKind(s);
-  return `<span class="s k-${k} ${cls}" ${slotAttrs(s)}><span class="lbl">${labelHTML(s)}</span><span class="c">${contentHTML(s, D.visibleContent(s))}</span></span>`;
+  return `<span class="s k-${k} ${s.owner ? '' : 'unclaimed'} ${cls}" ${slotAttrs(s)}><span class="foil" aria-hidden="true"></span><span class="lbl">${labelHTML(s)}</span><span class="c">${contentHTML(s, D.visibleContent(s))}</span></span>`;
 }
 
 // Background slots: a small tag in the section corner, and the section color.
@@ -132,7 +137,9 @@ function redrawSlot(id, contentOverride = null) {
     el.className = el.className.replace(/\bk-\w+/, 'k-' + k);
     el.dataset.chip = chipText(s);
     el.dataset.heat = heatLevel(s);
-    el.innerHTML = `<span class="lbl">${labelHTML(s)}</span><span class="c">${contentHTML(s, content)}</span>`;
+    el.dataset.tier = tierOf(s);
+    el.classList.toggle('unclaimed', !s.owner);
+    el.innerHTML = `<span class="foil" aria-hidden="true"></span><span class="lbl">${labelHTML(s)}</span><span class="c">${contentHTML(s, content)}</span>`;
   });
   if (s.kind === 'background') {
     const sec = $(`[data-bg="${s.path}"]`);
@@ -311,8 +318,8 @@ function eventSentence(e) {
     case 'rent-end': return `Rental on ${slot.toLowerCase()} ended`;
     case 'upgrade': return `${slot} upgraded to ${esc(e.to)} by ${w} · burned ${num(e.amount)} ${esc(C.ticker)}`;
     case 'retire': return `${slot} upgrade expired, back to ${esc(e.to)}`;
-    case 'shuffle': return `${w} pressed SHUFFLE. Everything moved.`;
-    case 'unshuffle': return 'Shuffle ended. The page snapped back.';
+    case 'shuffle': return `${w} pressed SHAKE. Everything fell into the wrong place.`;
+    case 'unshuffle': return 'The shake wore off. Everything snapped back.';
     case 'withdraw': return `${w} withdrew ${money(e.amount)}`;
     default: return `${slot} ${esc(e.kind)}`;
   }
@@ -320,7 +327,7 @@ function eventSentence(e) {
 
 function eventRow(e) {
   return `<button class="ev" data-action="goto" data-id="${e.slotId || ''}">
-    <span class="evk k-${esc(e.kind)}">${esc(e.kind.toUpperCase())}</span>
+    <span class="evk k-${esc(e.kind)}">${esc(e.kind === 'shuffle' ? 'SHAKE' : e.kind === 'unshuffle' ? 'SETTLE' : e.kind.toUpperCase())}</span>
     <span class="evs">${eventSentence(e)}${e.path ? `<small>${esc(e.path)}</small>` : ''}</span>
     <span class="evt">${ago(e.time)}</span></button>`;
 }
@@ -380,7 +387,7 @@ function apiPage() {
 
 function docsPage() {
   const p = (t, b) => `<div class="rule"><h3>${t}</h3><p>${b}</p></div>`;
-  return page('This page is not a page.', 'DOCUMENTATION', `
+  return page('Everything here is loose.', 'HOW IT WORKS', `
     <p class="lead">It looks like an ordinary landing page. Every visible element, from nav links and headlines to images, section backgrounds and footer links, is a separate slot with its own owner. There are ${D.getSlots().length} of them.</p>
     <h4 class="plabel">HOW IT WORKS</h4>
     ${p('Buy', `An unclaimed slot costs its current price, starting from a floor of ${E.floor} SOL and higher for more valuable spots like the nav and the headline.`)}
@@ -391,7 +398,9 @@ function docsPage() {
     ${p('Set your own price', `Move your asking price between ${E.markupMin}× and ${E.markupMax}×. Mark it up to scare people off, down to invite a take. It resets when the slot changes hands.`)}
     ${p('Rent it out', `List it at a daily rate (at least ${E.rentFloorPerDay * 100}% of its price per day). A tenant writes in it for up to ${E.rentMaxDays} days while you keep ownership. The protocol keeps ${E.rentProtocolCut * 100}% of rent. A tenancy survives a take.`)}
     ${p('Upgrade it', `Turn a text slot into a link, image, background or video by burning ${esc(C.ticker)}: ${Object.entries(E.upgradeBurn).map(([k, v]) => `${num(v)} for ${k}`).join(', ')}. Upgrades last ${E.upgradeDays} days. Images need a wide slot, video needs a big one.`)}
-    ${p('Shuffle', `Now and then a SHUFFLE button shows up. Pressing it swaps the content of every owned slot with another one for ${E.shuffleMinutes} minutes. Nobody loses anything, only what is shown moves. At most ${E.shuffleMaxPerWeek} per week.`)}
+    ${p('Shake', `Now and then a SHAKE button shows up. Pressing it rattles the whole page, and every owned slot lands in someone else\u2019s spot for ${E.shuffleMinutes} minutes. Nobody loses anything, only what is shown moves. At most ${E.shuffleMaxPerWeek} per week.`)}
+    ${p('Rarity', 'Slots that keep getting taken level up. After 6 takes a slot turns HOLO, after 10 it turns GOLD. Hover one and watch the foil move.')}
+    ${p('Everything is on a spring', 'Hover a slot and it leans toward you. Grab one with the mouse and pull it, it snaps back when you let go. When a slot gets taken it pops and knocks its neighbours around.')}
     ${p('Withdraw', 'Payouts from takes and rent are credited to your balance. You claim them yourself on the Withdraw page.')}
     <h4 class="plabel">THIS DEMO</h4>
     <p class="muted">${esc(C.copy.demoNote)} Everything is simulated in your browser and saved only for this tab. Press D for demo controls.</p>`);
@@ -410,7 +419,7 @@ function shell() {
         <div class="fbox"><span>CLEAN VIEW</span><button class="switch" data-action="clean" aria-pressed="false"><i></i></button><button class="tog" data-action="heat" aria-pressed="false">HEAT</button></div></div>
       <div class="seg"><button data-action="cur" data-cur="USD">USD</button><button data-action="cur" data-cur="SOL" class="on">SOL</button></div>
     </div>
-    <button id="shufflebtn" class="shufflebtn" data-action="shuffle" hidden>SHUFFLE</button>
+    <button id="shufflebtn" class="shufflebtn" data-action="shuffle" hidden>SHAKE THE PAGE</button>
     <div id="card" class="card-pop" hidden></div>
     <div id="overlay" class="overlay" hidden></div>
     <div id="editor" class="editor" hidden role="dialog" aria-modal="true"></div>
@@ -430,6 +439,7 @@ function route() {
   $('#bottomrow').innerHTML = bottomRow();
   D.getSlots().filter((s) => s.kind === 'background').forEach((s) => redrawSlot(s.id));
   window.scrollTo(0, 0);
+  rescan();
   if (name === 'slot' && arg) setTimeout(() => gotoSlot(Number(arg)), 50);
 }
 
@@ -439,7 +449,7 @@ function updateTicker() {
   const e = D.getEvents()[0];
   $('#tickertext').innerHTML = e ? `${eventSentence(e)} · ${ago(e.time)}` : 'No activity yet.';
   const sh = D.getShuffle();
-  $('#shufflechip').innerHTML = sh ? `<b class="shchip">SHUFFLED · SNAPS BACK IN ${left(sh.until - Date.now())}</b>` : '';
+  $('#shufflechip').innerHTML = sh ? `<b class="shchip">SHAKEN · SNAPS BACK IN ${left(sh.until - Date.now())}</b>` : '';
   if (!$('#drawer').hidden) renderDrawer();
 }
 
@@ -685,6 +695,7 @@ function showModal() {
       <div class="mr"><b>Buy</b><p>Claim an unclaimed slot from <strong>${E.floor} SOL</strong> and set what it says.</p></div>
       <div class="mr"><b>Take</b><p>Anyone can take an owned slot for <strong>${E.takeMultiplier}×</strong> its price. The previous owner is paid <strong>${E.previousOwnerShare}×</strong>, so getting taken pays you.</p></div>
       <div class="mr"><b>Decay</b><p>Idle slots lose <strong>${Math.round((1 - E.decayPerWeek) * 100)}% of their price per week</strong>, sliding back toward the floor. The cheap ones are the forgotten ones.</p></div>
+      <div class="mr"><b>Poke it</b><p>Everything here hangs on a <strong>spring</strong>. Hover a slot, grab it, pull it. Slots that keep getting taken turn <strong>HOLO</strong>, then <strong>GOLD</strong>.</p></div>
     </div>
     <div class="mfoot"><a href="#/docs" data-action="close-modal">${esc(m.docs)}</a><div class="row"><button class="ghost" data-action="close-modal">${esc(m.ok)}</button><button class="wbtn" data-action="cheapest">${esc(m.cheapest)}</button></div></div>
   </div>`;
@@ -713,8 +724,9 @@ function renderDemo() {
     <button data-action="demo" data-demo="burst">10 events fast</button>
     <button data-action="demo" data-demo="fill">Fill every slot</button>
     <button data-action="demo" data-demo="empty">Empty every slot</button>
-    <button data-action="demo" data-demo="shuffle">Show SHUFFLE button</button>
-    <button data-action="demo" data-demo="unshuffle">End shuffle</button>
+    <button data-action="demo" data-demo="shuffle">Show SHAKE button</button>
+    <button data-action="demo" data-demo="unshuffle">End the shake</button>
+    <button data-action="demo" data-demo="kick">Knock a random slot</button>
     <button data-action="demo" data-demo="week">Skip 1 week (decay)</button>
     <button data-action="demo" data-demo="reset">Reset to starting page</button>
     <p class="muted small">Press D or Escape to hide.</p>`;
@@ -726,7 +738,8 @@ function runDemo(kind) {
   if (kind === 'fill') D.fillAll();
   if (kind === 'empty') D.emptyAll();
   if (kind === 'shuffle') $('#shufflebtn').hidden = false;
-  if (kind === 'unshuffle') D.endShuffle();
+  if (kind === 'unshuffle') { shake(0.5); D.endShuffle(); }
+  if (kind === 'kick') { const vis = $$('#view .s[data-id]').filter((el) => { const r = el.getBoundingClientRect(); return r.top > 0 && r.bottom < innerHeight; }); const el = vis[Math.floor(Math.random() * vis.length)]; if (el) kick(Number(el.dataset.id), 1.3); }
   if (kind === 'week') D.fastForward(1);
   if (kind === 'reset') { D.resetState(); indexSlots(); try { sessionStorage.removeItem('ee-seen'); } catch { /* ignore */ } route(); }
   toast('Demo: ' + kind);
@@ -756,6 +769,7 @@ function onAction(el, ev) {
       document.body.classList.toggle('build', ui.build);
       $$('.menu.open').forEach((x) => x.classList.remove('open'));
       $('#top').innerHTML = topbar();
+      rescan();
       toast(ui.build ? 'Build mode: every slot is outlined with its number and price.' : 'Build mode off.');
       break;
     case 'help': showModal(); break;
@@ -803,7 +817,9 @@ function onAction(el, ev) {
     case 'upgrade-pick': ui.draft.upgrade = el.dataset.type; renderEditor(); break;
     case 'withdraw': try { const amt = D.withdraw(); toast(`Claimed ${money(amt)} (demo).`); route(); } catch (e) { toast(e.message); } break;
     case 'shuffle':
-      try { D.startShuffle(); el.hidden = true; toast('Shuffled! Everything swapped places for 90 minutes.'); } catch (e) { toast(e.message); }
+      el.hidden = true;
+      shake(1.5);
+      setTimeout(() => { try { D.startShuffle(); shake(0.7); toast('Shaken! Everything landed in the wrong place for 90 minutes.'); } catch (e) { toast(e.message); } }, 280);
       break;
     case 'close-demo': $('#demo').hidden = true; break;
     case 'demo': runDemo(el.dataset.demo); break;
@@ -820,6 +836,7 @@ function bind() {
     const slotEl = ev.target.closest('.s[data-id]');
     if (slotEl && !ev.target.closest('#editor')) {
       ev.preventDefault();
+      if (consumeDragClick()) return;
       if (ui.draft) return;
       openCard(Number(slotEl.dataset.id), slotEl);
       return;
@@ -883,6 +900,8 @@ function bind() {
 D.subscribe((ids) => {
   if (ids.length > 40) { indexSlots(); redrawAll(); } else ids.forEach((id) => { if (!ui.draft || ui.draft.id !== id) redrawSlot(id); });
   if (ids.length <= 40) ids.forEach((id) => { if (!ui.draft || ui.draft.id !== id) flash(id); });
+  const last = D.getEvents()[0];
+  if (ids.length <= 2 && last && Date.now() - last.time < 2000 && (last.kind === 'take' || last.kind === 'buy' || last.kind === 'rent')) kick(last.slotId, last.kind === 'take' ? 1 : 0.7);
   if (ui.cardId && ids.includes(ui.cardId)) openCard(ui.cardId);
   updateTicker();
 });
@@ -896,7 +915,7 @@ function scheduleSimulation() {
   }, a + Math.random() * (b - a));
 }
 
-// The SHUFFLE button shows up now and then, at no fixed time.
+// The SHAKE button shows up now and then, at no fixed time.
 setInterval(() => {
   const btn = $('#shufflebtn');
   if (!btn || D.getShuffle()) return;
@@ -907,7 +926,13 @@ setInterval(() => { D.tick(); updateTicker(); }, 15000);
 
 shell();
 bind();
+initMotion();
 route();
+
+// The top bar turns into a floating pill as you scroll (--p goes 0 -> 1).
+let navRaf = 0;
+function navProgress() { navRaf = 0; const tb = $('.topbar'); if (tb) tb.style.setProperty('--p', Math.min(1, window.scrollY / 160).toFixed(3)); }
+window.addEventListener('scroll', () => { if (!navRaf) navRaf = requestAnimationFrame(navProgress); }, { passive: true });
 updateTicker();
 scheduleSimulation();
 let seen = false;

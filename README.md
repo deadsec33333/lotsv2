@@ -1,4 +1,4 @@
-# Every Element Is for Sale (frontend demo, v2)
+# Every Element Is for Sale (frontend demo, v3)
 
 A dark, crowded landing page where every one of its 165 elements is a separately owned slot: nav links, headline, images, buttons, section backgrounds, footer links. It works like notawebsite.fun, rebuilt for Solana / pump.fun.
 
@@ -13,6 +13,16 @@ It runs entirely in your browser. There is no backend, no database, no real wall
 
 If macOS won't open the shortcut: open Terminal, paste `cd "$HOME/Desktop/Every Element Frontend"`, press Return, then run `npm install` (only the first time) and `npm run dev`.
 
+## Our spin: everything is loose
+
+- **Springs everywhere.** Every slot bobs gently on its own, trails behind when you scroll and bounces back into place (the same spring feel as the stockcoin site), tilts toward your mouse, and leans a little toward the cursor.
+- **Grab and pull.** With a mouse you can drag any slot on a rubber band; let go and it snaps home with a wobble. A normal click still opens the slot card.
+- **Takes knock things around.** When a slot is bought or taken it pops, and every slot near it gets knocked away and springs back.
+- **SHAKE instead of shuffle.** The random button is now SHAKE THE PAGE: everything gets rattled, then lands in someone else's spot for 90 minutes.
+- **Collectible foil.** Slots that keep getting taken level up: HOLO after 6 takes, GOLD after 10, with a moving foil ring.
+- **Own look.** Dotted board background, sticker-yellow highlight, chrome buttons with a glint, rounded tiles, floating pill top bar and live bar, unclaimed slots shown as faded "ghost" template text, new wording.
+- Motion turns off automatically if the visitor's device asks for reduced motion. On phones the springs are softer and only images bob.
+
 ## What you can do on the page
 
 - **First visit box** explains Buy, Take and Decay. "Show me the cheapest slot" scrolls to it and opens it. The `?` button brings the box back.
@@ -22,12 +32,12 @@ If macOS won't open the shortcut: open Terminal, paste `cd "$HOME/Desktop/Every 
 - When you own a slot: **Edit** (text, color, highlight, bold, italic, strike, underline, caps, box, size, link, hover message, images), **Set price** (0.1x to 4x), **List for rent**, **Upgrade** (text to link, image, background or video, "burning" $TICKER, 21 days).
 - **Rent** a RENTABLE slot for 1 to 7 days and write in it while the owner keeps it.
 - **Decay:** idle slots lose 10% of their price per week toward the floor.
-- **SHUFFLE** button appears at random: owned slots swap contents for 90 minutes.
+- **SHAKE** button appears at random: the page rattles and owned slots swap contents for 90 minutes.
 - **Bottom bar:** LIVE shows the latest event; INDEXER opens the full feed with filters.
 - **Bottom right:** CLEAN VIEW hides all labels, HEAT colors slots by how often they were taken, USD / SOL switches every price.
 - **BUY menu:** buy $TICKER on pump.fun, or jump to the cheapest slot. **BUILD menu:** build mode (every slot outlined with number and price), My slots, History, Timeline, Withdraw, Docs.
 - **Footer pages:** History, Timeline, Docs, API (all slots as JSON), Withdraw (claim what you earned), My slots.
-- Press **D** for demo controls: random event, 10 events, fill all, empty all, show SHUFFLE, end shuffle, skip a week, reset.
+- Press **D** for demo controls: random event, 10 events, fill all, empty all, show SHAKE, end the shake, knock a random slot, skip a week, reset.
 
 State is kept for this browser tab (session storage), so refreshing keeps your changes; closing the tab resets.
 
@@ -59,6 +69,7 @@ This creates `dist/`. `npm run preview` shows exactly that build. `npm test` run
 - `src/art.js`: generated pixel avatars, icons, logos and poster images.
 - `src/data.js`: the fake "chain": prices, buy, take, edit, markup, rent, upgrade, shuffle, withdraw, decay, simulation, saving.
 - `src/main.js`: the page, slot cards, editor, pages, ticker, indexer, controls.
+- `src/motion.js`: all the spring physics (jelly scroll, hover tilt, drag, knocks, shake).
 - `src/styles.css`: the whole look, desktop and phone.
 - `tests/data.test.js`: checks for all the economy rules.
 - `public/favicon.svg`: tab icon.
